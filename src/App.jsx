@@ -212,7 +212,7 @@ export default function App() {
         )}
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 text-black dark:text-white">
           {/* Voice Selection */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -221,7 +221,7 @@ export default function App() {
             <select
               value={voice}
               onChange={(e) => setVoice(e.target.value)}
-              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
+              className="w-full p-3 border-2 def-black dark:def-white border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
             >
               {thaiVoices.map(v => (
                 <option key={v.value} value={v.value}>{v.label}</option>
@@ -287,7 +287,7 @@ export default function App() {
                 setError('');
               }}
               placeholder="พิมพ์ข้อความที่นี่... เช่น สวัสดีครับ วันนี้อากาศดีมากเลยนะ"
-              className="w-full h-40 p-4 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors resize-none"
+              className="w-full h-40 p-4 border-2 border-gray-200 rounded-lg def-black dark:def-white focus:border-purple-500 focus:outline-none transition-colors resize-none"
             />
             <div className="text-sm text-gray-500 mt-2">
               {text.length} ตัวอักษร
@@ -298,7 +298,7 @@ export default function App() {
           <div className="mb-6">
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 def-black dark:def-white rounded-lg transition-colors"
             >
               <Upload className="w-4 h-4" />
               อัปโหลดไฟล์ .txt
