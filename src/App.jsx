@@ -19,7 +19,22 @@ export default function App() {
   const thaiVoices = [
     { value: 'th-TH-PremwadeeNeural', label: 'เปรมวดี (ผู้หญิง)' },
     { value: 'th-TH-NiwatNeural', label: 'นิวัฒน์ (ผู้ชาย)' },
-    { value: 'th-TH-AcharaNeural', label: 'อัจฉรา (ผู้หญิง)' }
+    { value: 'en-US-AnaNeural', label: 'แอนนา (หญิง)' },
+    { value: 'en-US-AndrewMultilingualNeural', label: 'แอนดิวหลายภาษา (ผู้ชาย)' },
+    { value: 'en-US-AndrewNeural', label: 'แอนดิว (ผู้ชาย)' },
+    { value: 'en-US-AriaNeural', label: 'แอเรีย (ผู้หญิง)' },
+    { value: 'en-US-AvaMultilingualNeural', label: 'อวาหลายภาษา (ผู้หญิง)' },
+    { value: 'en-US-AvaNeural', label: 'อวา (ผู้หญิง)' },
+    { value: 'en-US-BrianMultilingualNeural', label: 'ไบรอันหลายภาษา (ผู้ชาย)' },
+    { value: 'en-US-BrianNeural', label: 'ไบริอัน (ผู้ชาย)' },
+    { value: 'en-US-ChristopherNeural', label: 'คริสโตเฟอร์ (ผู้ชาย)' },
+    { value: 'en-US-EmmaMultilingualNeural', label: 'เอมม่าหลายภาษา (ผู้หญิง)' },
+    { value: 'en-US-EricNeural', label: 'เอริค (ผู้ชาย)' },
+    { value: 'en-US-GuyNeural', label: 'กาย (ผู้ชาย)' },
+    { value: 'en-US-JennyNeural', label: 'เจนนี่ (ผู้หญิง)' },
+    { value: 'en-US-MichelleNeural', label: 'มิชชิล (ผู้หญิง)' },
+    { value: 'en-US-RogerNeural', label: 'โรเจอร์ (ผู้ชาย)' },
+    { value: 'en-US-SteffanNeural', label: 'สเตฟาน (ผู้ชาย)' },
   ];
 
   const handleFileUpload = (e) => {
