@@ -1,99 +1,116 @@
-import React, { useState, useRef } from 'react';
-import { Upload, Download, Play, Pause, Volume2, AlertCircle } from 'lucide-react';
+import React, { useState, useRef } from "react";
+import {
+  Upload,
+  Download,
+  Play,
+  Pause,
+  Volume2,
+  AlertCircle,
+} from "lucide-react";
 
 export default function App() {
-  const [text, setText] = useState('');
-  const [voice, setVoice] = useState('th-TH-PremwadeeNeural');
+  const [text, setText] = useState("");
+  const [voice, setVoice] = useState("th-TH-PremwadeeNeural");
   const [rate, setRate] = useState(20); // -50 ถึง 100
   const [pitch, setPitch] = useState(-5); // -50 ถึง 50
   const [isPlaying, setIsPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
 
   // ⚠️ เปลี่ยน URL นี้เป็น URL ของ Render.com ของคุณ
   const API_URL = import.meta.env.VITE_API_URL || 'https://tts-backend-1-h80q.onrender.com';
+  // const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
   const thaiVoices = [
-    { value: 'th-TH-PremwadeeNeural', label: 'TH เปรมวดี (ผู้หญิง)' },
-    { value: 'th-TH-NiwatNeural', label: 'TH นิวัฒน์ (ผู้ชาย)' },
-    { value: 'en-US-AnaNeural', label: 'US แอนนา (หญิง)' },
-    { value: 'en-US-AndrewMultilingualNeural', label: 'US แอนดิวหลายภาษา (ผู้ชาย)' },
-    { value: 'en-US-AndrewNeural', label: 'US แอนดิว (ผู้ชาย)' },
-    { value: 'en-US-AriaNeural', label: 'US แอเรีย (ผู้หญิง)' },
-    { value: 'en-US-AvaMultilingualNeural', label: 'US อวาหลายภาษา (ผู้หญิง)' },
-    { value: 'en-US-AvaNeural', label: 'US อวา (ผู้หญิง)' },
-    { value: 'en-US-BrianMultilingualNeural', label: 'US ไบรอันหลายภาษา (ผู้ชาย)' },
-    { value: 'en-US-BrianNeural', label: 'US ไบริอัน (ผู้ชาย)' },
-    { value: 'en-US-ChristopherNeural', label: 'US คริสโตเฟอร์ (ผู้ชาย)' },
-    { value: 'en-US-EmmaMultilingualNeural', label: 'US เอมม่าหลายภาษา (ผู้หญิง)' },
-    { value: 'en-US-EricNeural', label: 'US เอริค (ผู้ชาย)' },
-    { value: 'en-US-GuyNeural', label: 'US กาย (ผู้ชาย)' },
-    { value: 'en-US-JennyNeural', label: 'US เจนนี่ (ผู้หญิง)' },
-    { value: 'en-US-MichelleNeural', label: 'US มิชชิล (ผู้หญิง)' },
-    { value: 'en-US-RogerNeural', label: 'US โรเจอร์ (ผู้ชาย)' },
-    { value: 'en-US-SteffanNeural', label: 'US สเตฟาน (ผู้ชาย)' },
+    { value: "th-TH-PremwadeeNeural", label: "TH เปรมวดี (ผู้หญิง)" },
+    { value: "th-TH-NiwatNeural", label: "TH นิวัฒน์ (ผู้ชาย)" },
+    { value: "en-US-AnaNeural", label: "US แอนนา (หญิง)" },
+    {
+      value: "en-US-AndrewMultilingualNeural",
+      label: "US แอนดิวหลายภาษา (ผู้ชาย)",
+    },
+    { value: "en-US-AndrewNeural", label: "US แอนดิว (ผู้ชาย)" },
+    { value: "en-US-AriaNeural", label: "US แอเรีย (ผู้หญิง)" },
+    { value: "en-US-AvaMultilingualNeural", label: "US อวาหลายภาษา (ผู้หญิง)" },
+    { value: "en-US-AvaNeural", label: "US อวา (ผู้หญิง)" },
+    {
+      value: "en-US-BrianMultilingualNeural",
+      label: "US ไบรอันหลายภาษา (ผู้ชาย)",
+    },
+    { value: "en-US-BrianNeural", label: "US ไบริอัน (ผู้ชาย)" },
+    { value: "en-US-ChristopherNeural", label: "US คริสโตเฟอร์ (ผู้ชาย)" },
+    {
+      value: "en-US-EmmaMultilingualNeural",
+      label: "US เอมม่าหลายภาษา (ผู้หญิง)",
+    },
+    { value: "en-US-EricNeural", label: "US เอริค (ผู้ชาย)" },
+    { value: "en-US-GuyNeural", label: "US กาย (ผู้ชาย)" },
+    { value: "en-US-JennyNeural", label: "US เจนนี่ (ผู้หญิง)" },
+    { value: "en-US-MichelleNeural", label: "US มิชชิล (ผู้หญิง)" },
+    { value: "en-US-RogerNeural", label: "US โรเจอร์ (ผู้ชาย)" },
+    { value: "en-US-SteffanNeural", label: "US สเตฟาน (ผู้ชาย)" },
   ];
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    if (file && file.type === 'text/plain') {
+    if (file && file.type === "text/plain") {
       const reader = new FileReader();
       reader.onload = (event) => {
         setText(event.target.result);
-        setError('');
+        setError("");
       };
-      reader.readAsText(file, 'UTF-8');
+      reader.readAsText(file, "UTF-8");
     } else {
-      setError('กรุณาเลือกไฟล์ .txt เท่านั้น');
+      setError("กรุณาเลือกไฟล์ .txt เท่านั้น");
     }
   };
 
   const handleStreamPlay = async () => {
     if (!text.trim()) {
-      setError('กรุณาใส่ข้อความที่ต้องการอ่าน');
+      setError("กรุณาใส่ข้อความที่ต้องการอ่าน");
       return;
     }
 
     setLoading(true);
     setProgress(0);
-    setError('');
+    setError("");
 
     try {
       const response = await fetch(`${API_URL}/tts/stream-chunks`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           text: text,
           voice: voice,
-          rate: `${rate >= 0 ? '+' : ''}${rate}%`,
-          pitch: `${pitch >= 0 ? '+' : ''}${pitch}Hz`
-        })
+          rate: `${rate >= 0 ? "+" : ""}${rate}%`,
+          pitch: `${pitch >= 0 ? "+" : ""}${pitch}Hz`,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('ไม่สามารถสร้างเสียงได้');
+        throw new Error("ไม่สามารถสร้างเสียงได้");
       }
 
-      const contentLength = response.headers.get('Content-Length');
+      const contentLength = response.headers.get("Content-Length");
       const total = contentLength ? parseInt(contentLength, 10) : 0;
-      
+
       const reader = response.body.getReader();
       const chunks = [];
       let receivedLength = 0;
 
       while (true) {
         const { done, value } = await reader.read();
-        
+
         if (done) break;
-        
+
         chunks.push(value);
         receivedLength += value.length;
-        
+
         // อัพเดท progress
         if (total > 0) {
           setProgress(Math.round((receivedLength / total) * 100));
@@ -114,7 +131,7 @@ export default function App() {
       }
 
       // สร้าง blob และเล่น
-      const blob = new Blob([chunksAll], { type: 'audio/mpeg' });
+      const blob = new Blob([chunksAll], { type: "audio/mpeg" });
       const url = URL.createObjectURL(blob);
 
       if (audioRef.current) {
@@ -128,8 +145,8 @@ export default function App() {
         audioRef.current.load();
       }
     } catch (err) {
-      console.error('Error:', err);
-      setError('เกิดข้อผิดพลาด: ' + err.message);
+      console.error("Error:", err);
+      setError("เกิดข้อผิดพลาด: " + err.message);
       setLoading(false);
       setProgress(0);
     }
@@ -137,36 +154,36 @@ export default function App() {
 
   const handleSaveMP3 = async () => {
     if (!text.trim()) {
-      setError('กรุณาใส่ข้อความที่ต้องการอ่าน');
+      setError("กรุณาใส่ข้อความที่ต้องการอ่าน");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const response = await fetch(`${API_URL}/tts/save`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           text: text,
           voice: voice,
-          rate: `${rate >= 0 ? '+' : ''}${rate}%`,
-          pitch: `${pitch >= 0 ? '+' : ''}${pitch}Hz`
-        })
+          rate: `${rate >= 0 ? "+" : ""}${rate}%`,
+          pitch: `${pitch >= 0 ? "+" : ""}${pitch}Hz`,
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || 'ไม่สามารถสร้างไฟล์ได้');
+        throw new Error(errorData.detail || "ไม่สามารถสร้างไฟล์ได้");
       }
 
       // ดึง filename จาก header
-      const contentDisposition = response.headers.get('Content-Disposition');
+      const contentDisposition = response.headers.get("Content-Disposition");
       let filename = `tts_${new Date().getTime()}.mp3`;
-      
+
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (filenameMatch) {
@@ -176,25 +193,29 @@ export default function App() {
 
       // แปลง response เป็น blob
       const blob = await response.blob();
-      
+
       // สร้าง URL และดาวน์โหลด
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
-      
+
       // Clean up
       setTimeout(() => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }, 100);
 
-      console.log('ดาวน์โหลดสำเร็จ:', filename);
+      console.log("ดาวน์โหลดสำเร็จ:", filename);
     } catch (err) {
-      console.error('Error:', err);
-      setError('เกิดข้อผิดพลาด: ' + err.message + '\n\nกรุณาตรวจสอบว่า Backend ทำงานอยู่');
+      console.error("Error:", err);
+      setError(
+        "เกิดข้อผิดพลาด: " +
+          err.message +
+          "\n\nกรุณาตรวจสอบว่า Backend ทำงานอยู่",
+      );
     } finally {
       setLoading(false);
     }
@@ -211,9 +232,7 @@ export default function App() {
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
           <div className="flex items-center gap-3 mb-2">
             <Volume2 className="w-8 h-8 text-purple-600" />
-            <h1 className="text-3xl font-bold text-gray-800">
-              Text-to-Speech
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-800">Text-to-Speech</h1>
           </div>
           <p className="text-gray-600">แปลงข้อความเป็นเสียงพูดภาษาไทย</p>
         </div>
@@ -238,8 +257,10 @@ export default function App() {
               onChange={(e) => setVoice(e.target.value)}
               className="w-full p-3 border-2 def-black dark:def-white border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
             >
-              {thaiVoices.map(v => (
-                <option key={v.value} value={v.value}>{v.label}</option>
+              {thaiVoices.map((v) => (
+                <option key={v.value} value={v.value}>
+                  {v.label}
+                </option>
               ))}
             </select>
           </div>
@@ -247,7 +268,9 @@ export default function App() {
           {/* Speed Control */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              ความเร็ว: {rate > 0 ? '+' : ''}{rate}% {rate === 0 ? '(ปกติ)' : rate > 0 ? '(เร็วขึ้น)' : '(ช้าลง)'}
+              ความเร็ว: {rate > 0 ? "+" : ""}
+              {rate}%{" "}
+              {rate === 0 ? "(ปกติ)" : rate > 0 ? "(เร็วขึ้น)" : "(ช้าลง)"}
             </label>
             <input
               type="range"
@@ -257,7 +280,7 @@ export default function App() {
               onChange={(e) => setRate(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #9333ea 0%, #9333ea ${(rate + 50) / 1.5}%, #e5e7eb ${(rate + 50) / 1.5}%, #e5e7eb 100%)`
+                background: `linear-gradient(to right, #9333ea 0%, #9333ea ${(rate + 50) / 1.5}%, #e5e7eb ${(rate + 50) / 1.5}%, #e5e7eb 100%)`,
               }}
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -270,7 +293,9 @@ export default function App() {
           {/* Pitch Control */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              ระดับเสียง: {pitch > 0 ? '+' : ''}{pitch}Hz {pitch === 0 ? '(ปกติ)' : pitch > 0 ? '(สูงขึ้น)' : '(ต่ำลง)'}
+              ระดับเสียง: {pitch > 0 ? "+" : ""}
+              {pitch}Hz{" "}
+              {pitch === 0 ? "(ปกติ)" : pitch > 0 ? "(สูงขึ้น)" : "(ต่ำลง)"}
             </label>
             <input
               type="range"
@@ -280,7 +305,7 @@ export default function App() {
               onChange={(e) => setPitch(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #2563eb 0%, #2563eb ${(pitch + 50)}%, #e5e7eb ${(pitch + 50)}%, #e5e7eb 100%)`
+                background: `linear-gradient(to right, #2563eb 0%, #2563eb ${pitch + 50}%, #e5e7eb ${pitch + 50}%, #e5e7eb 100%)`,
               }}
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -299,7 +324,7 @@ export default function App() {
               value={text}
               onChange={(e) => {
                 setText(e.target.value);
-                setError('');
+                setError("");
               }}
               placeholder="พิมพ์ข้อความที่นี่... เช่น สวัสดีครับ วันนี้อากาศดีมากเลยนะ"
               className="w-full h-40 p-4 border-2 border-gray-200 rounded-lg def-black dark:def-white focus:border-purple-500 focus:outline-none transition-colors resize-none"
@@ -337,11 +362,15 @@ export default function App() {
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {progress > 0 ? `${progress}%` : 'กำลังประมวลผล...'}
+                  {progress > 0 ? `${progress}%` : "กำลังประมวลผล..."}
                 </>
               ) : (
                 <>
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                  {isPlaying ? (
+                    <Pause className="w-5 h-5" />
+                  ) : (
+                    <Play className="w-5 h-5" />
+                  )}
                   เล่นเสียง (Stream)
                 </>
               )}
@@ -370,7 +399,7 @@ export default function App() {
           {loading && progress > 0 && (
             <div className="mt-4">
               <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div 
+                <div
                   className="bg-purple-600 h-2.5 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 ></div>
@@ -382,18 +411,16 @@ export default function App() {
           )}
 
           {/* Audio Player (Hidden) */}
-          <audio
-            ref={audioRef}
-            onEnded={handleAudioEnded}
-            className="hidden"
-          />
+          <audio ref={audioRef} onEnded={handleAudioEnded} className="hidden" />
         </div>
 
         {/* Quick Test */}
         <div className="mt-6 bg-white rounded-2xl shadow-xl p-6">
           <h3 className="font-semibold text-gray-800 mb-3">💡 ทดสอบด่วน</h3>
           <button
-            onClick={() => setText('สวัสดีครับ ยินดีต้อนรับสู่ระบบแปลงข้อความเป็นเสียง')}
+            onClick={() =>
+              setText("สวัสดีครับ ยินดีต้อนรับสู่ระบบแปลงข้อความเป็นเสียง")
+            }
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
           >
             ใส่ข้อความตัวอย่าง
