@@ -6,23 +6,55 @@ import {
   Pause,
   Volume2,
   AlertCircle,
+  Loader,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 
 export default function App() {
   const [text, setText] = useState("");
   const [voice, setVoice] = useState("th-TH-PremwadeeNeural");
-  const [rate, setRate] = useState(20); // -50 ถึง 100
-  const [pitch, setPitch] = useState(-5); // -50 ถึง 50
+  const [rate, setRate] = useState(0); // -50 ถึง 100
+  const [pitch, setPitch] = useState(0); // -50 ถึง 50
   const [isPlaying, setIsPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [serverStatus, setServerStatus] = useState("checking");
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
 
   // ⚠️ เปลี่ยน URL นี้เป็น URL ของ Render.com ของคุณ
-  const API_URL = import.meta.env.VITE_API_URL || 'https://tts-backend-1-h80q.onrender.com';
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://tts-backend-1-h80q.onrender.com";
   // const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+  React.useEffect(() => {
+    const wakeUpServer = async () => {
+      console.log("🚀 กำลังปลุก Render server...");
+      setServerStatus("checking");
+
+      try {
+        const startTime = Date.now();
+        const response = await fetch(`${API_URL}/health`, {
+          method: "GET",
+        });
+
+        if (response.ok) {
+          const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+          console.log(`✅ Server พร้อมใช้งาน! (${elapsed} วินาที)`);
+          setServerStatus("online");
+        } else {
+          setServerStatus("offline");
+        }
+      } catch (error) {
+        console.error("❌ ไม่สามารถเชื่อมต่อ server:", error.message);
+        setServerStatus("offline");
+      }
+    };
+
+    wakeUpServer();
+  }, [API_URL]);
 
   const thaiVoices = [
     { value: "th-TH-PremwadeeNeural", label: "TH เปรมวดี (ผู้หญิง)" },
@@ -230,9 +262,35 @@ export default function App() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Volume2 className="w-8 h-8 text-purple-600" />
-            <h1 className="text-3xl font-bold text-gray-800">Text-to-Speech</h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <Volume2 className="w-8 h-8 text-purple-600" />
+              <h1 className="text-3xl font-bold text-gray-800">
+                Text-to-Speech
+              </h1>
+            </div>
+
+            {/* Server Status */}
+            <div className="flex items-center gap-2">
+              {serverStatus === "checking" && (
+                <>
+                  <Loader className="w-4 h-4 text-blue-600 animate-spin" />
+                  <span className="text-sm text-blue-600">กำลังตรวจสอบ...</span>
+                </>
+              )}
+              {serverStatus === "online" && (
+                <>
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-green-600">พร้อมใช้งาน</span>
+                </>
+              )}
+              {serverStatus === "offline" && (
+                <>
+                  <XCircle className="w-4 h-4 text-red-600" />
+                  <span className="text-sm text-red-600">ออฟไลน์</span>
+                </>
+              )}
+            </div>
           </div>
           <p className="text-gray-600">แปลงข้อความเป็นเสียงพูดภาษาไทย</p>
         </div>
@@ -245,8 +303,23 @@ export default function App() {
           </div>
         )}
 
+        {/* Server Waking Up Alert */}
+        {serverStatus === "checking" && (
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6 flex gap-3">
+            <Loader className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5 animate-spin" />
+            <div className="text-blue-700">
+              <p className="font-semibold">กำลังปลุก Server...</p>
+              <p className="text-sm mt-1">
+                Render.com Free Plan จะ sleep หลังไม่มีการใช้งาน 15 นาที
+                <br />
+                กำลังรอ server ตื่น อาจใช้เวลา 30-60 วินาที
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-black dark:text-white">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Voice Selection */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -285,7 +358,7 @@ export default function App() {
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>-50% (ช้ามาก)</span>
-              <span>20% (เร็ว)</span>
+              <span>0% (ปกติ)</span>
               <span>+100% (เร็วมาก)</span>
             </div>
           </div>
@@ -327,7 +400,7 @@ export default function App() {
                 setError("");
               }}
               placeholder="พิมพ์ข้อความที่นี่... เช่น สวัสดีครับ วันนี้อากาศดีมากเลยนะ"
-              className="w-full h-40 p-4 border-2 border-gray-200 rounded-lg def-black dark:def-white focus:border-purple-500 focus:outline-none transition-colors resize-none"
+              className="w-full h-40 p-4 border-2 border-gray-200 def-black dark:def-white rounded-lg focus:border-purple-500 focus:outline-none transition-colors resize-none"
             />
             <div className="text-sm text-gray-500 mt-2">
               {text.length} ตัวอักษร
@@ -338,7 +411,7 @@ export default function App() {
           <div className="mb-6">
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-4 py-2 def-black dark:def-white rounded-lg transition-colors"
+              className="flex items-center def-black dark:def-white gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
               <Upload className="w-4 h-4" />
               อัปโหลดไฟล์ .txt
